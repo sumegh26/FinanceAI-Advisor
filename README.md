@@ -58,8 +58,80 @@ FinanceAI-Advisor/
 └── requirements.txt      # Dependencies
 
 ```
+## 🚀 Features
 
-### Key Design Decisions
+### Current Features
+
+#### ✅ **Core Transaction Management**
+- **Full CRUD Operations**: Create, Read, Update, Delete transactions
+- **Rich Data Model**: Support for categories, tags, descriptions, and metadata
+- **Transaction Types**: Income, Expense, Investment, Transfer
+- **Automatic Timestamps**: Created and transaction date tracking
+
+#### ✅ **Advanced Filtering & Search**
+- **Category Filtering**: Find transactions by category
+- **Date Range Queries**: Filter by custom date ranges
+- **Transaction Type Filtering**: Separate income from expenses
+- **Multi-Parameter Combinations**: Complex query support
+
+#### ✅ **Financial Analytics**
+- **Real-Time Calculations**: Live balance and total calculations
+- **Category Breakdown**: Spending analysis by category
+- **Transaction Summaries**: Count and amount aggregations
+- **Time-Based Insights**: Date range analytics
+
+#### ✅ **Professional API Design**
+- **RESTful Endpoints**: Standard HTTP methods and status codes
+- **JSON Responses**: Consistent response format with success/error indicators
+- **Error Handling**: Comprehensive error messages and validation feedback
+- **Health Monitoring**: Service health check endpoint
+
+#### ✅ **Data Validation & Security**
+- **Input Sanitization**: Prevents malformed data
+- **Required Field Validation**: Ensures data completeness
+- **Type Checking**: Validates data types and formats
+- **Business Rule Enforcement**: Amount validation, category rules
+
+#### ✅ **Testing Infrastructure**
+- **Unit Tests**: Comprehensive API endpoint testing
+- **Test Coverage**: High test coverage for critical functions
+- **Automated Testing**: pytest integration with CI/CD ready
+- **Mock Data**: Consistent test fixtures
+
+### ⏭ Upcoming Features
+
+#### ✅ **Phase 1: Core Platform (Current)**
+
+- Flask + SQLite + REST API + Basic Validation
+
+
+#### 🔄 **Phase 2: Data Persistence**
+- SQLite/PostgreSQL database integration
+- Database migrations and schema management
+- Connection pooling and optimization
+- Data backup and recovery
+
+#### 🔄 **Phase 3: AI Integration**
+- LangChain integration for natural language processing
+- OpenAI GPT for financial insights and recommendations
+- Automated transaction categorization using ML
+- Spending pattern recognition and alerts
+
+#### 🔄 **Phase 4: Advanced AI Features**
+- Multi-agent workflows for complex financial analysis
+- Investment recommendation engine
+- Risk assessment and portfolio optimization
+- Goal-based financial planning
+
+#### 🔄 **Phase 5: Production Ready**
+- Docker containerization
+- CI/CD pipeline with GitHub Actions
+- Production deployment configuration
+- Performance monitoring and logging
+
+---
+
+### 🗝 Key Design Decisions
 
 #### 1. **Application Factory Pattern**
 **Decision**: Use Flask Application Factory  
@@ -111,73 +183,7 @@ FinanceAI-Advisor/
 
 ---
 
-## 🚀 Features
 
-### Current Features
-
-#### ✅ **Core Transaction Management**
-- **Full CRUD Operations**: Create, Read, Update, Delete transactions
-- **Rich Data Model**: Support for categories, tags, descriptions, and metadata
-- **Transaction Types**: Income, Expense, Investment, Transfer
-- **Automatic Timestamps**: Created and transaction date tracking
-
-#### ✅ **Advanced Filtering & Search**
-- **Category Filtering**: Find transactions by category
-- **Date Range Queries**: Filter by custom date ranges
-- **Transaction Type Filtering**: Separate income from expenses
-- **Multi-Parameter Combinations**: Complex query support
-
-#### ✅ **Financial Analytics**
-- **Real-Time Calculations**: Live balance and total calculations
-- **Category Breakdown**: Spending analysis by category
-- **Transaction Summaries**: Count and amount aggregations
-- **Time-Based Insights**: Date range analytics
-
-#### ✅ **Professional API Design**
-- **RESTful Endpoints**: Standard HTTP methods and status codes
-- **JSON Responses**: Consistent response format with success/error indicators
-- **Error Handling**: Comprehensive error messages and validation feedback
-- **Health Monitoring**: Service health check endpoint
-
-#### ✅ **Data Validation & Security**
-- **Input Sanitization**: Prevents malformed data
-- **Required Field Validation**: Ensures data completeness
-- **Type Checking**: Validates data types and formats
-- **Business Rule Enforcement**: Amount validation, category rules
-
-#### ✅ **Testing Infrastructure**
-- **Unit Tests**: Comprehensive API endpoint testing
-- **Test Coverage**: High test coverage for critical functions
-- **Automated Testing**: pytest integration with CI/CD ready
-- **Mock Data**: Consistent test fixtures
-
-### Upcoming Features
-
-#### 🔄 **Phase 2: Data Persistence **
-- SQLite/PostgreSQL database integration
-- Database migrations and schema management
-- Connection pooling and optimization
-- Data backup and recovery
-
-#### 🔄 **Phase 3: AI Integration **
-- LangChain integration for natural language processing
-- OpenAI GPT for financial insights and recommendations
-- Automated transaction categorization using ML
-- Spending pattern recognition and alerts
-
-#### 🔄 **Phase 4: Advanced AI Features **
-- Multi-agent workflows for complex financial analysis
-- Investment recommendation engine
-- Risk assessment and portfolio optimization
-- Goal-based financial planning
-
-#### 🔄 **Phase 5: Production Ready (Days 22-30)**
-- Docker containerization
-- CI/CD pipeline with GitHub Actions
-- Production deployment configuration
-- Performance monitoring and logging
-
----
 
 ## ⚡ Quick Start
 
@@ -367,3 +373,31 @@ curl -X PUT http://127.0.0.1:5000/api/v1/transactions/550e8400-e29b-41d4-a716-44
     "tags": ["updated", "modified"]
   }'
 ```
+## 🤝 Contributing
+Contribution & Branching
+```
+main: stable code
+
+develop: active changes
+
+feature/: prefix for new features
+```
+
+Pull Request Guidelines
+```
+Submit changes to a feature or develop branch.
+
+Write clear commit and PR messages.
+
+Only document implemented functionality.
+```
+
+<div align="center">
+
+### 🚀 Ready to Transform Financial Management with AI?
+
+**[⚡ Get Started](#-quick-start) | [📚 Read the Docs](#-api-documentation) | [🤝 Contribute](#-contributing) | [⭐ Star on GitHub](https://github.com/sumegh26/FinanceAI-Advisor)**
+
+---
+
+</div>
