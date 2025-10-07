@@ -1,0 +1,425 @@
+# FinanceAI-Advisor .gitignore
+# Comprehensive Python Flask project .gitignore
+
+# ==========================================
+# PYTHON SPECIFIC
+# ==========================================
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+#  Usually these files are written by a python script from a template
+#  before PyInstaller builds the exe, so as to inject date/other infos into it.
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# Translations
+*.mo
+*.pot
+
+# ==========================================
+# FLASK SPECIFIC
+# ==========================================
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Flask sessions
+flask_session/
+
+# ==========================================
+# VIRTUAL ENVIRONMENTS
+# ==========================================
+
+# Virtual environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+.venv
+
+# Anaconda environments
+.conda
+
+# pyenv
+.python-version
+
+# Pipenv
+Pipfile.lock
+
+# ==========================================
+# DATABASE FILES
+# ==========================================
+
+# SQLite databases
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+
+# PostgreSQL
+*.pgsql
+
+# Database migrations (if using Flask-Migrate)
+migrations/versions/*.pyc
+
+# ==========================================
+# IDE AND EDITOR FILES
+# ==========================================
+
+# VS Code
+.vscode/
+.vscode/settings.json
+.vscode/launch.json
+.vscode/extensions.json
+.vscode/tasks.json
+*.code-workspace
+
+# PyCharm
+.idea/
+*.iws
+*.iml
+*.ipr
+__pypackages__/
+
+# Sublime Text
+*.tmlanguage.cache
+*.tmPreferences.cache
+*.stTheme.cache
+*.sublime-workspace
+*.sublime-project
+
+# Vim
+*.swp
+*.swo
+*~
+.netrwhist
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# Atom
+.atom/
+
+# ==========================================
+# OPERATING SYSTEM FILES
+# ==========================================
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+.fseventsd
+.VolumeIcon.icns
+.AppleDouble
+.LSOverride
+Icon
+
+# Linux
+*~
+.directory
+.Trash-*
+
+# ==========================================
+# LOGS AND TEMPORARY FILES
+# ==========================================
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Temporary folders
+tmp/
+temp/
+
+# ==========================================
+# AI AND ML SPECIFIC
+# ==========================================
+
+# Model files (large binaries)
+*.pkl
+*.h5
+*.onnx
+*.pb
+*.pth
+*.joblib
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# Vector databases
+faiss_index/
+chroma_db/
+pinecone_data/
+
+# LangChain cache
+.langchain/
+langchain_cache/
+
+# Hugging Face cache
+.cache/huggingface/
+transformers_cache/
+
+# OpenAI API keys and responses cache
+openai_cache/
+
+# ==========================================
+# CLOUD AND DEPLOYMENT
+# ==========================================
+
+# Docker
+.dockerignore
+Dockerfile.dev
+docker-compose.override.yml
+.docker/
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+
+# Kubernetes
+*.kubeconfig
+
+# ==========================================
+# SECURITY AND SECRETS
+# ==========================================
+
+# Environment variables with secrets
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# API keys and secrets
+secrets/
+*.key
+*.pem
+*.crt
+*.csr
+*.p12
+*.pfx
+
+# OAuth tokens
+.oauth
+tokens/
+
+# ==========================================
+# DOCUMENTATION AND MEDIA
+# ==========================================
+
+# Generated documentation
+docs/_build/
+docs/site/
+
+# Media files (if not part of the app)
+media/
+uploads/
+user_uploads/
+
+# ==========================================
+# MONITORING AND ANALYSIS
+# ==========================================
+
+# Performance monitoring
+newrelic.ini
+.newrelic/
+
+# Code analysis
+.sonarqube/
+.scannerwork/
+
+# Profiling
+*.prof
+
+# ==========================================
+# PROJECT SPECIFIC
+# ==========================================
+
+# FinanceAI-Advisor specific ignores
+
+# Transaction data backups
+transaction_backups/
+*.backup
+
+# Financial data exports
+exports/
+*.csv.backup
+*.xlsx
+
+# AI model training data
+training_data/
+model_weights/
+
+# User uploaded documents
+receipts/
+statements/
+documents/
+
+# Configuration overrides
+config_local.py
+local_settings.py
+
+# Test data
+test_transactions.json
+sample_data/
+
+# Staging environment
+staging/
+
+# Performance test results
+performance_results/
+
+# ==========================================
+# DEVELOPMENT TOOLS
+# ==========================================
+
+# Coverage reports
+htmlcov/
+.coverage
+coverage.xml
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Black
+.black
+
+# isort
+.isort.cfg
+
+# pre-commit
+.pre-commit-config.yaml.backup
+
+# Bandit security linter
+.bandit
+
+# ==========================================
+# CI/CD AND GITHUB ACTIONS
+# ==========================================
+
+# GitHub Actions artifacts
+.github/workflows/*.log
+
+# GitLab CI
+.gitlab-ci-local/
+
+# ==========================================
+# BACKUP AND ARCHIVE FILES
+# ==========================================
+
+# Backup files
+*.bak
+*.backup
+*.old
+*.orig
+*.save
+*.swp
+*.tmp
+
+# Archive files
+*.zip
+*.tar.gz
+*.7z
+*.rar
+
+# ==========================================
+# CUSTOM ADDITIONS
+# ==========================================
+
+# Add any project-specific files here
+# Example:
+# custom_config/
+# proprietary_data/
+# client_data/
