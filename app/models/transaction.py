@@ -5,12 +5,11 @@ This module defines the Transaction data model for financial transactions
 including income, expenses, investments, and other financial activities.
 """
 
+from app.extensions import db
 from datetime import datetime
-from typing import Dict, List, Optional
-import uuid
 
-
-class Transaction:
+class Transaction(db.Model):
+        
     """
     Transaction model representing a financial transaction
     
@@ -24,78 +23,25 @@ class Transaction:
         created_at (datetime): When the record was created
         tags (List[str]): Optional tags for additional categorization
     """
-    
-    def __init__(
-        self, 
-        amount: float, 
-        category: str, 
-        description: str, 
-        transaction_type: str,
-        date: Optional[datetime] = None,
-        tags: Optional[List[str]] = None
-    ):
-        """
-        Initialize a new Transaction
-        
-        Args:
-            amount: Transaction amount
-            category: Transaction category
-            description: Transaction description
-            transaction_type: Type of transaction
-            date: Transaction date (defaults to current time)
-            tags: Optional list of tags
-        """
-        self.id = str(uuid.uuid4())
-        self.amount = float(amount)
-        self.category = category.lower().strip()
-        self.description = description.strip()
-        self.transaction_type = transaction_type.lower()
-        self.date = date or datetime.now()
-        self.created_at = datetime.now()
-        self.tags = tags or []
-    
-    def to_dict(self) -> Dict:
-        """
-        Convert transaction to dictionary representation
-        
-        Returns:
-            Dict: Transaction data as dictionary
-        """
+    __tablename__ = "transactions"
+
+    id = db.Column(db.Integer, primary_key=True)
+    amount = db.Column(db.Float, nullable=False)
+    category = db.Column(db.String(64), nullable=False)
+    description = db.Column(db.Text, nullable=True)
+    transaction_type = db.Column(db.String(32), nullable=False)
+    date = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    tags = db.Column(db.Text, nullable=True)  # Store JSON string for simplicity
+
+    def to_dict(self):
         return {
-            'id': self.id,
-            'amount': self.amount,
-            'category': self.category,
-            'description': self.description,
-            'transaction_type': self.transaction_type,
-            'date': self.date.isoformat(),
-            'created_at': self.created_at.isoformat(),
-            'tags': self.tags
+            "id": self.id,
+            "amount": self.amount,
+            "category": self.category,
+            "description": self.description,
+            "transaction_type": self.transaction_type,
+            "date": self.date.isoformat(),
+            "created_at": self.created_at.isoformat(),
+            "tags": self.tags.split(',') if self.tags else []
         }
-    
-    @classmethod
-    def from_dict(cls, data: Dict) -> 'Transaction':
-        """
-        Create Transaction instance from dictionary data
-        
-        Args:
-            data: Dictionary containing transaction data
-            
-        Returns:
-            Transaction: New transaction instance
-        """
-        transaction = cls(
-            amount=data['amount'],
-            category=data['category'],
-            description=data['description'],
-            transaction_type=data['transaction_type'],
-            date=datetime.fromisoformat(data.get('date', datetime.now().isoformat())),
-            tags=data.get('tags', [])
-        )
-        # Preserve original ID if provided
-        if 'id' in data:
-            transaction.id = data['id']
-        return transaction
-    
-    def __repr__(self) -> str:
-        """String representation of transaction"""
-        return f"Transaction(id='{self.id}', amount={self.amount}, category='{self.category}')"
