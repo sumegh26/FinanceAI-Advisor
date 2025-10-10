@@ -11,6 +11,13 @@ import os
 # Create Flask application instance
 app = create_app()
 
+# Allows flask db commands to work
+# @app.cli.command("show-db")
+# @with_appcontext
+# def show_db():
+#     """Test to check DB connection."""
+#     click.echo(f"Database is connected! Current Database URI: {db.get_engine().url}")
+
 if __name__ == '__main__':
     # Get configuration from environment variables
     host = os.getenv('FLASK_HOST', '127.0.0.1')

@@ -11,11 +11,9 @@ from app.models.transaction import Transaction
 from app.utils.validators import validate_transaction_data
 from datetime import datetime
 from typing import Dict, List
+from app import db
 
-
-# In-memory storage(will be replaced with database in future)
-transactions_store: Dict[str, Transaction] = {}
-
+# Database storage added via SQLAlchemy
 
 @finance_bp.route('/transactions', methods=['GET'])
 def get_transactions():
@@ -39,7 +37,8 @@ def get_transactions():
         end_date = request.args.get('end_date')
         
         # Start with all transactions
-        filtered_transactions = list(transactions_store.values())
+        # filtered_transactions = list(transactions_store.values())
+        filtered_transactions = Transaction.query.all()     #query all transactions from the database
         
         # Apply filters
         if category:
@@ -130,13 +129,13 @@ def create_transaction():
             category=data['category'],
             description=data['description'],
             transaction_type=data['transaction_type'],
-            date=datetime.fromisoformat(data['date']) if data.get('date') else None,
-            tags=data.get('tags', [])
+            date=datetime.fromisoformat(data['date']) if data.get('date') else datetime.utcnow(),
+            tags=','.join(data.get('tags', [])) if data.get('tags') else None
         )
-        
-        # Store transaction
-        transactions_store[transaction.id] = transaction
-        
+
+        # Store transaction in the database
+        db.session.add(transaction)
+        db.session.commit()
         return jsonify({
             'success': True,
             'data': transaction.to_dict(),
@@ -169,14 +168,15 @@ def get_transaction(transaction_id: str):
         JSON: Transaction data or error message
     """
     try:
-        if transaction_id not in transactions_store:
+        transaction = Transaction.query.get(transaction_id)
+        if not transaction:
             return jsonify({
                 'success': False,
                 'error': 'Transaction not found',
                 'message': f'No transaction found with ID: {transaction_id}'
             }), 404
-        
-        transaction = transactions_store[transaction_id]
+
+        transaction = Transaction.query.get(transaction_id)
         
         return jsonify({
             'success': True,
@@ -207,7 +207,8 @@ def update_transaction(transaction_id: str):
         JSON: Updated transaction data
     """
     try:
-        if transaction_id not in transactions_store:
+        transaction = Transaction.query.get(transaction_id)
+        if not transaction:
             return jsonify({
                 'success': False,
                 'error': 'Transaction not found',
@@ -223,7 +224,7 @@ def update_transaction(transaction_id: str):
             }), 400
         
         # Get existing transaction
-        transaction = transactions_store[transaction_id]
+        transaction = Transaction.query.get(transaction_id)
         
         # Update fields if provided
         if 'amount' in data:
@@ -271,7 +272,8 @@ def delete_transaction(transaction_id: str):
         JSON: Success message or error
     """
     try:
-        if transaction_id not in transactions_store:
+        transaction = Transaction.query.get(transaction_id)
+        if not transaction:
             return jsonify({
                 'success': False,
                 'error': 'Transaction not found',
@@ -279,8 +281,9 @@ def delete_transaction(transaction_id: str):
             }), 404
         
         # Delete transaction
-        deleted_transaction = transactions_store.pop(transaction_id)
-        
+        db.session.delete(transaction)
+        db.session.commit()
+        deleted_transaction = transaction
         return jsonify({
             'success': True,
             'message': f'Transaction {transaction_id} deleted successfully',
@@ -304,7 +307,7 @@ def get_transactions_summary():
         JSON: Summary including total income, expenses, balance, and category breakdown
     """
     try:
-        transactions = list(transactions_store.values())
+        transactions = list(Transaction.query.all())
         
         if not transactions:
             return jsonify({

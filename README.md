@@ -9,7 +9,7 @@
 
 **AI-Driven Personal Finance Management Platform with Intelligent Insights**
 
-FinanceAI-Advisor is a comprehensive, AI-powered financial management system that evolves from basic transaction tracking into a sophisticated financial advisor. Built with modern Python technologies and designed for scalability, this platform demonstrates enterprise-level software architecture while solving real-world financial management challenges.
+FinanceAI-Advisor is a comprehensive, AI-powered financial management system that evolves from basic transaction tracking into a sophisticated financial advisor. Built with modern Python technologies and designed for scalability, this platform demonstrates enterprise-level software architecture while solving real-world financial challenges.
 
 ### Problem Statement
 Most people struggle with:
@@ -25,7 +25,7 @@ FinanceAI-Advisor provides:
 - **AI-Powered Analytics**: Machine learning-driven financial patterns recognition
 - **Personalized Recommendations**: Custom budget optimization and investment advice
 - **Predictive Insights**: Future spending forecasts and goal tracking
-- **Comprehensive Reporting**: Beautiful visualizations and detailed financial reports
+- **Comprehensive Reporting**: visualizations and detailed financial reports
 
 ---
 
@@ -36,7 +36,7 @@ FinanceAI-Advisor provides:
 #### **Current Architecture**
 ```
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Web Client    │───▶│   Flask API     │───▶│   In-Memory     │
+│   Web Client    │───▶│   Flask API     │───▶│   SQLite DB     │
 └─────────────────┘    └─────────────────┘    └─────────────────┘
 ```
 
@@ -49,21 +49,31 @@ FinanceAI-Advisor/
 │   ├── api/               # REST API layer
 │   │   ├── __init__.py    # Blueprint registration
 │   │   └── routes.py      # All API endpoints and business logic
-│   ├── models/            # Data models layer
+│   ├── models/            # SQLAlchemy data models layer
 │   │   └── transaction.py # Transaction data model with validation
 │   └── utils/             # Utility functions
 │       └── validators.py  # Input validation logic
 ├── tests/                 # Test suite
 ├── run.py                # Application entry point
-└── requirements.txt      # Dependencies
+├── requirements.txt      # Dependencies	
+└── README.md # This file
 
 ```
+### Technology Stack & Tools
+- Python 3.12+, Flask 3.0
+- Flask-Migrate integration
+- Alembic for database migrations
+- Environment variable configuration with `.env`
+  
+### ⏭ Upcoming Features
+- SQLite database via SQLAlchemy ORM
+
 ## 🚀 Features
 
 ### Current Features
 
 #### ✅ **Core Transaction Management**
-- **Full CRUD Operations**: Create, Read, Update, Delete transactions
+- **Full CRUD Operations**: Create, Read, Update, Delete transactions using persistent SQLite database
 - **Rich Data Model**: Support for categories, tags, descriptions, and metadata
 - **Transaction Types**: Income, Expense, Investment, Transfer
 - **Automatic Timestamps**: Created and transaction date tracking
@@ -92,94 +102,6 @@ FinanceAI-Advisor/
 - **Type Checking**: Validates data types and formats
 - **Business Rule Enforcement**: Amount validation, category rules
 
-
-### ⏭ Upcoming Features
-
-#### ✅ **Phase 1: Core Platform (Current)**
-
-- Flask + SQLite + REST API + Basic Validation
-
-
-#### 🔄 **Phase 2: Data Persistence**
-- SQLite/PostgreSQL database integration
-- Database migrations and schema management
-- Connection pooling and optimization
-- Data backup and recovery
-
-#### 🔄 **Phase 3: AI Integration**
-- LangChain integration for natural language processing
-- OpenAI GPT for financial insights and recommendations
-- Automated transaction categorization using ML
-- Spending pattern recognition and alerts
-
-#### 🔄 **Phase 4: Advanced AI Features**
-- Multi-agent workflows for complex financial analysis
-- Investment recommendation engine
-- Risk assessment and portfolio optimization
-- Goal-based financial planning
-
-#### 🔄 **Phase 5: Production Ready**
-- Docker containerization
-- CI/CD pipeline with GitHub Actions
-- Production deployment configuration
-- Performance monitoring and logging
-
----
-
-### 🗝 Key Design Decisions
-
-#### 1. **Application Factory Pattern**
-**Decision**: Use Flask Application Factory  
-**Rationale**:
-- **Testability**: Enables creation of app instances with different configurations
-- **Scalability**: Supports multiple environments (dev, test, prod)
-- **Maintainability**: Centralizes app configuration and initialization
-- **Best Practice**: Follows official Flask recommendations
-
-#### 2. **Blueprint-Based Modular Architecture**
-**Decision**: Organize routes using Flask Blueprints  
-**Rationale**:
-- **Separation of Concerns**: Each blueprint handles specific functionality
-- **Scalability**: Easy to add new feature modules
-- **Team Development**: Multiple developers can work on different blueprints
-- **URL Organization**: Clean, RESTful API structure
-
-#### 3. **Model-First Design**
-**Decision**: Start with comprehensive data models  
-**Rationale**:
-- **Data Integrity**: Ensures consistent data structure
-- **Validation**: Built-in data validation and sanitization
-- **Serialization**: Easy conversion between Python objects and JSON
-- **Future-Proof**: Ready for database integration
-
-#### 4. **In-Memory Storage (Phase 1)**
-**Decision**: Use Python dictionaries for initial storage  
-**Rationale**:
-- **Rapid Prototyping**: Quick setup without database complexity
-- **Learning Focus**: Concentrate on API design and business logic
-- **Easy Testing**: Predictable state for unit tests
-- **Migration Path**: Clear upgrade path to persistent storage
-
-#### 5. **Comprehensive Input Validation**
-**Decision**: Separate validation layer with detailed error handling  
-**Rationale**:
-- **Security**: Prevents injection attacks and data corruption
-- **User Experience**: Clear error messages guide API users
-- **Maintainability**: Centralized validation logic
-- **Professional Standards**: Enterprise-level input handling
-
-#### 6. **RESTful API Design**
-**Decision**: Follow REST conventions strictly  
-**Rationale**:
-- **Industry Standard**: Familiar to all developers
-- **HTTP Semantics**: Proper use of HTTP methods and status codes
-- **Statelessness**: Scalable and cacheable
-- **Documentation**: Self-describing API structure
-
----
-
-
-
 ## ⚡ Quick Start
 
 ### Prerequisites
@@ -193,7 +115,7 @@ FinanceAI-Advisor/
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/yourusername/FinanceAI-Advisor.git
+git clone https://github.com/sumegh26/FinanceAI-Advisor.git
 cd FinanceAI-Advisor
 
 # 2. Create and activate virtual environment
@@ -211,7 +133,11 @@ pip install -r requirements.txt
 cp .env.example .env
 # Edit .env with your configuration
 
-# 5. Run the application
+# 5.Initialize & migrate database
+set FLASK_APP=run.py # Windows PowerShell: $env:FLASK_APP="run.py"
+flask db upgrade
+
+# 6. Run the application
 python run.py
 ```
 
@@ -246,7 +172,7 @@ pytest tests/ -v
 
 - **Base URL**: `http://127.0.0.1:5000/api/v1`
 - **Content-Type**: `application/json`
-- **Response Format**: JSON with consistent structure
+- **Response Format**: JSON with consistent structure with success flags and error details
 
 ### Response Format
 

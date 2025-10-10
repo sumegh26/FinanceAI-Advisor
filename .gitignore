@@ -114,6 +114,7 @@ Pipfile.lock
 
 # Database migrations (if using Flask-Migrate)
 migrations/versions/*.pyc
+migrations/versions/
 
 # ==========================================
 # IDE AND EDITOR FILES
