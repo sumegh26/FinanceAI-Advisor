@@ -5,13 +5,13 @@ This module contains all the REST API endpoints for managing financial transacti
 budgets, and generating financial insights.
 """
 
-from flask import request, jsonify
+from flask import request
 from app.api import finance_bp
 from app.models.transaction import Transaction
 from app.utils.validators import validate_transaction_data, ValidationError
 from datetime import datetime
-from typing import Dict, List
 from app import db
+from app.utils.response import json_response
 
 # Database storage added via SQLAlchemy
 
@@ -71,19 +71,10 @@ def get_transactions():
         result = [t.to_dict() for t in filtered_transactions]
         result.sort(key=lambda x: x['date'], reverse=True)
         
-        return jsonify({
-            'success': True,
-            'data': result,
-            'count': len(result),
-            'message': f'Retrieved {len(result)} transactions'
-        }), 200
+        return json_response(True, f"Retrieved {len(result)} transactions", data=result, status_code=200)
         
     except Exception as e:
-        return jsonify({
-            'success': False,
-            'error': str(e),
-            'message': 'Failed to retrieve transactions'
-        }), 500
+        return json_response(False, "Failed to retrieve transactions", error=str(e), status_code=500)
 
 
 @finance_bp.route('/transactions', methods=['POST'])
@@ -108,21 +99,12 @@ def create_transaction():
         validate_transaction_data(data)  # Validate input data
         
         if not data:
-            return jsonify({
-                'success': False,
-                'error': 'No JSON data provided',
-                'message': 'Request must contain valid JSON data'
-            }), 400
+            return json_response(False, 'Request must contain valid JSON data', error='No JSON data provided', status_code=400)
         
         # Validate required fields
         validation_result = validate_transaction_data(data)
         if not validation_result['valid']:
-            return jsonify({
-                'success': False,
-                'error': 'Validation failed',
-                'message': validation_result['message'],
-                'details': validation_result['errors']
-            }), 400
+            return json_response(False, 'Validation failed', error=validation_result['message'], details=validation_result['errors'], status_code=400)
         
         # Create new transaction
         transaction = Transaction(
@@ -137,24 +119,14 @@ def create_transaction():
         # Store transaction in the database
         db.session.add(transaction)
         db.session.commit()
-        return jsonify({
-            'success': True,
-            'data': transaction.to_dict(),
-            'message': 'Transaction created successfully'
-        }), 201
+
+        return json_response(True, "Transaction created successfully", transaction.to_dict(), status_code=201)
         
     except ValueError as e:
-        return jsonify({
-            'success': False,
-            'error': 'Invalid data format',
-            'message': str(e)
-        }), 400
+        return json_response(False, "Input validation failed", error=e.message, details=e.errors, status_code=400)
+    
     except Exception as e:
-        return jsonify({
-            'success': False,
-            'error': str(e),
-            'message': 'Failed to create transaction'
-        }), 500
+        return json_response(False, "Failed to create transaction", error=str(e), status_code=500)
 
 
 @finance_bp.route('/transactions/<transaction_id>', methods=['GET'])
@@ -171,26 +143,14 @@ def get_transaction(transaction_id: str):
     try:
         transaction = Transaction.query.get(transaction_id)
         if not transaction:
-            return jsonify({
-                'success': False,
-                'error': 'Transaction not found',
-                'message': f'No transaction found with ID: {transaction_id}'
-            }), 404
+            return json_response(False, f'No transaction found with ID: {transaction_id}', error='Transaction not found', status_code=404)
 
         transaction = Transaction.query.get(transaction_id)
         
-        return jsonify({
-            'success': True,
-            'data': transaction.to_dict(),
-            'message': 'Transaction retrieved successfully'
-        }), 200
+        return json_response(True, 'Transaction retrieved successfully', data=transaction.to_dict(), status_code=200)
         
     except Exception as e:
-        return jsonify({
-            'success': False,
-            'error': str(e),
-            'message': 'Failed to retrieve transaction'
-        }), 500
+        return json_response(False, 'Failed to retrieve transaction', error=str(e), status_code=500)
 
 
 @finance_bp.route('/transactions/<transaction_id>', methods=['PUT'])
@@ -210,20 +170,12 @@ def update_transaction(transaction_id: str):
     try:
         transaction = Transaction.query.get(transaction_id)
         if not transaction:
-            return jsonify({
-                'success': False,
-                'error': 'Transaction not found',
-                'message': f'No transaction found with ID: {transaction_id}'
-            }), 404
+            return json_response(False, f'No transaction found with ID: {transaction_id}', error='Transaction not found', status_code=404)
         
         data = request.get_json()
         validate_transaction_data(data)  # Validate input data
         if not data:
-            return jsonify({
-                'success': False,
-                'error': 'No JSON data provided',
-                'message': 'Request must contain valid JSON data'
-            }), 400
+            return json_response(False, 'Request must contain valid JSON data', error='No JSON data provided', status_code=400)
         
         # Get existing transaction
         transaction = Transaction.query.get(transaction_id)
@@ -242,24 +194,12 @@ def update_transaction(transaction_id: str):
         if 'tags' in data:
             transaction.tags = data['tags']
         
-        return jsonify({
-            'success': True,
-            'data': transaction.to_dict(),
-            'message': 'Transaction updated successfully'
-        }), 200
+        return json_response(True, 'Transaction updated successfully', transaction.to_dict(), status_code=200)
         
     except ValueError as e:
-        return jsonify({
-            'success': False,
-            'error': 'Invalid data format',
-            'message': str(e)
-        }), 400
+        return json_response(False, 'Input validation failed', error=e.message, details=e.errors, status_code=400)
     except Exception as e:
-        return jsonify({
-            'success': False,
-            'error': str(e),
-            'message': 'Failed to update transaction'
-        }), 500
+        return json_response(False, 'Failed to update transaction', error=str(e), status_code=500)
 
 
 @finance_bp.route('/transactions/<transaction_id>', methods=['DELETE'])
@@ -276,28 +216,16 @@ def delete_transaction(transaction_id: str):
     try:
         transaction = Transaction.query.get(transaction_id)
         if not transaction:
-            return jsonify({
-                'success': False,
-                'error': 'Transaction not found',
-                'message': f'No transaction found with ID: {transaction_id}'
-            }), 404
+            return json_response(False, f'No transaction found with ID: {transaction_id}', error='Transaction not found', status_code=404)
         
         # Delete transaction
         db.session.delete(transaction)
         db.session.commit()
         deleted_transaction = transaction
-        return jsonify({
-            'success': True,
-            'message': f'Transaction {transaction_id} deleted successfully',
-            'deleted_transaction': deleted_transaction.to_dict()
-        }), 200
+        return json_response(True, f'Transaction {transaction_id} deleted successfully', deleted_transaction.to_dict(), status_code=200)
         
     except Exception as e:
-        return jsonify({
-            'success': False,
-            'error': str(e),
-            'message': 'Failed to delete transaction'
-        }), 500
+        return json_response(False, 'Failed to delete transaction', error=str(e), status_code=500)
 
 
 @finance_bp.route('/transactions/summary', methods=['GET'])
@@ -312,19 +240,15 @@ def get_transactions_summary():
         transactions = list(Transaction.query.all())
         
         if not transactions:
-            return jsonify({
-                'success': True,
-                'data': {
-                    'total_transactions': 0,
-                    'total_income': 0,
-                    'total_expenses': 0,
-                    'net_balance': 0,
-                    'categories': {},
-                    'transaction_types': {}
-                },
-                'message': 'No transactions found'
-            }), 200
-        
+            return json_response(True, 'No transactions found', data={
+                'total_transactions': 0,
+                'total_income': 0,
+                'total_expenses': 0,
+                'net_balance': 0,
+                'categories': {},
+                'transaction_types': {}, 
+            }, status_code=200)
+
         # Calculate totals
         total_income = sum(t.amount for t in transactions if t.transaction_type == 'income')
         total_expenses = sum(abs(t.amount) for t in transactions if t.transaction_type == 'expense')
@@ -363,27 +287,12 @@ def get_transactions_summary():
             'earliest_transaction_date': min(t.date.isoformat() for t in transactions)
         }
         
-        return jsonify({
-            'success': True,
-            'data': summary,
-            'message': 'Financial summary generated successfully'
-        }), 200
+        return json_response(True, 'Financial summary generated successfully', data=summary, status_code=200)
         
     except Exception as e:
-        return jsonify({
-            'success': False,
-            'error': str(e),
-            'message': 'Failed to generate summary'
-        }), 500
+        return json_response(False, 'Failed to generate summary', error=str(e), status_code=500)
 
 # Global error handler for ValidationError
 @finance_bp.errorhandler(ValidationError)
 def handle_validation_error(error):
-    response = jsonify({
-        "success": False,
-        "error": error.message,
-        "details": error.errors,
-        "message": "Input validation failed"
-    })
-    response.status_code = 400
-    return response
+    return json_response(False, "Input validation failed", error=error.message, details=error.errors, status_code=400)
