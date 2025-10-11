@@ -6,7 +6,8 @@ to ensure data integrity and security.
 """
 
 from typing import Dict, Any, List
-
+# from app.utils.exceptions import ValidationError
+from app.utils.exceptions import ValidationError
 
 def validate_transaction_data(data: Dict[str, Any]) -> Dict[str, Any]:
     """
@@ -20,7 +21,7 @@ def validate_transaction_data(data: Dict[str, Any]) -> Dict[str, Any]:
     """
     errors = []
     
-    # Required fields
+    # Validate required fields
     required_fields = ['amount', 'category', 'description', 'transaction_type']
     
     for field in required_fields:
@@ -59,8 +60,11 @@ def validate_transaction_data(data: Dict[str, Any]) -> Dict[str, Any]:
         except ValueError:
             errors.append("Date must be in ISO format (YYYY-MM-DDTHH:MM:SS)")
     
-    is_valid = len(errors) == 0
-    message = "Validation successful" if is_valid else "Validation failed"
+    if errors:
+        raise ValidationError("Invalid transaction data", errors)
+    else:
+        is_valid = True
+        message = "Validation successful"
     
     return {
         'valid': is_valid,
