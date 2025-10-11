@@ -7,15 +7,25 @@ and configurations.
 """
 
 from flask import Flask
-from app.extensions import db, migrate
+from app.extensions import db, migrate, limiter
 from app.api import finance_bp
 from app.api import finance_bp
 import os
 from flask import request
 from app.utils.logger import logger
+from flask import jsonify
 
 def create_app():
     app = Flask(__name__)
+
+    # rate limit exceeded handler
+    @app.errorhandler(429)
+    def ratelimit_handler(e):
+        return jsonify({
+            "success": False,
+            "message": "Rate limit exceeded",
+            "error": "Too many requests"
+        }), 429
 
     # Logging middleware
     @app.before_request
@@ -35,6 +45,12 @@ def create_app():
     # Init extensions
     db.init_app(app)
     migrate.init_app(app, db)
+
+    # Conditionally disable limiter in development
+    if os.getenv("FLASK_ENV") == "development":
+        limiter.enabled = False
+
+    limiter.init_app(app)
 
     # Register blueprints
     app.register_blueprint(finance_bp, url_prefix='/api/v1')

@@ -15,11 +15,13 @@ from app.extensions import db
 from app.utils.response import json_response
 from app.utils.logger import logger
 import traceback
+from app.extensions import limiter
 
 # Database storage added via SQLAlchemy
 
 #Get all transactions with optional filtering
 @finance_bp.route('/transactions', methods=['GET'])
+@limiter.limit("10 per minute") # Rate limit: 10 requests per minute per IP
 def get_transactions():
     """
     Get all transactions with optional filtering
@@ -80,6 +82,7 @@ def get_transactions():
 
 # Create a new transaction
 @finance_bp.route('/transactions', methods=['POST'])
+@limiter.limit("10 per minute")  # Rate limit: 10 requests per minute per IP
 def create_transaction():
     """
     Create a new financial transaction
@@ -128,6 +131,7 @@ def create_transaction():
 
 # Get a specific transaction by ID
 @finance_bp.route('/transactions/<transaction_id>', methods=['GET'])
+@limiter.limit("10 per minute")
 def get_transaction(transaction_id: str):
     """
     Get a specific transaction by ID
@@ -152,6 +156,7 @@ def get_transaction(transaction_id: str):
 
 # Update an existing transaction
 @finance_bp.route('/transactions/<transaction_id>', methods=['PUT'])
+@limiter.limit("10 per minute")
 def update_transaction(transaction_id: str):
     """
     Update an existing transaction
@@ -236,6 +241,7 @@ def delete_transaction(transaction_id: str):
 
 # Get a summary of all transactions
 @finance_bp.route('/transactions/summary', methods=['GET'])
+@limiter.limit("10 per minute")
 def get_transactions_summary():
     """
     Get financial summary and statistics
