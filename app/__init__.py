@@ -11,10 +11,22 @@ from app.extensions import db, migrate
 from app.api import finance_bp
 from app.api import finance_bp
 import os
-
+from flask import request
+from app.utils.logger import logger
 
 def create_app():
     app = Flask(__name__)
+
+    # Logging middleware
+    @app.before_request
+    def log_request_info():
+        logger.info(f"Incoming request: {request.method} {request.url}")
+
+    # Response logging
+    @app.after_request
+    def log_response_info(response):
+        logger.info(f"Response status: {response.status}")
+        return response
 
     # Database Config
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///financeai.db')
