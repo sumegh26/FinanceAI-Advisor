@@ -13,6 +13,8 @@ from app.utils.exceptions import NotFoundError
 from datetime import datetime
 from app.extensions import db
 from app.utils.response import json_response
+from app.utils.logger import logger
+import traceback
 
 # Database storage added via SQLAlchemy
 
@@ -300,16 +302,19 @@ def get_transactions_summary():
 # Global error handler for ValidationError
 @finance_bp.errorhandler(ValidationError) # decorator to catch ValidationError exceptions
 def handle_validation_error(error):
+    logger.warning(f"Validation Error: {error.message} Details: {error.errors}") # Log the validation error details
     return json_response(False, "Input validation failed", error=error.message, details=error.errors, status_code=400)
 
 # Global error handler for NotFoundError
 @finance_bp.errorhandler(NotFoundError) # decorator to catch NotFoundError exceptions
 def handle_not_found_error(error):
+    logger.warning(f"Not Found: {error.message}") # Log the not found error message
     return json_response(False, "Resource not found", error=error.message, status_code=404)
 
 # Global error handler for generic exceptions
 @finance_bp.errorhandler(Exception) # decorator to catch all other exceptions
 def handle_generic_error(error):
-    # Logging to be added in Issue #11
+    logger.error(f"Unhandled Exception: {str(error)}") # Log the error message
+    logger.error(traceback.format_exc()) # Log the full stack trace
     return json_response(False, "Internal server error", error=str(error), status_code=500)
 
