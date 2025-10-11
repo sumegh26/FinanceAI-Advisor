@@ -13,3 +13,12 @@ class ValidationError(Exception):
             "error": self.message,
             "details": self.errors
         }
+
+
+class NotFoundError(Exception):
+    """
+    Custom exception to be raised when a requested resource is not found.
+    """
+    def __init__(self, message="Resource not found"):
+        super().__init__(message)
+        self.message = message

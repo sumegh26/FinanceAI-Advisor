@@ -9,12 +9,14 @@ from flask import request
 from app.api import finance_bp
 from app.models.transaction import Transaction
 from app.utils.validators import validate_transaction_data, ValidationError
+from app.utils.exceptions import NotFoundError
 from datetime import datetime
-from app import db
+from app.extensions import db
 from app.utils.response import json_response
 
 # Database storage added via SQLAlchemy
 
+#Get all transactions with optional filtering
 @finance_bp.route('/transactions', methods=['GET'])
 def get_transactions():
     """
@@ -36,8 +38,6 @@ def get_transactions():
         start_date = request.args.get('start_date')
         end_date = request.args.get('end_date')
         
-        # Start with all transactions
-        # filtered_transactions = list(transactions_store.values())
         filtered_transactions = Transaction.query.all()     #query all transactions from the database
         
         # Apply filters
@@ -76,7 +76,7 @@ def get_transactions():
     except Exception as e:
         return json_response(False, "Failed to retrieve transactions", error=str(e), status_code=500)
 
-
+# Create a new transaction
 @finance_bp.route('/transactions', methods=['POST'])
 def create_transaction():
     """
@@ -96,16 +96,12 @@ def create_transaction():
     try:
         # Get JSON data from request
         data = request.get_json()
-        validate_transaction_data(data)  # Validate input data
-        
         if not data:
-            return json_response(False, 'Request must contain valid JSON data', error='No JSON data provided', status_code=400)
+            raise ValidationError('No JSON data provided', ['Request must contain valid JSON data'])
         
         # Validate required fields
-        validation_result = validate_transaction_data(data)
-        if not validation_result['valid']:
-            return json_response(False, 'Validation failed', error=validation_result['message'], details=validation_result['errors'], status_code=400)
-        
+        validate_transaction_data(data)
+
         # Create new transaction
         transaction = Transaction(
             amount=data['amount'],
@@ -128,7 +124,7 @@ def create_transaction():
     except Exception as e:
         return json_response(False, "Failed to create transaction", error=str(e), status_code=500)
 
-
+# Get a specific transaction by ID
 @finance_bp.route('/transactions/<transaction_id>', methods=['GET'])
 def get_transaction(transaction_id: str):
     """
@@ -143,16 +139,16 @@ def get_transaction(transaction_id: str):
     try:
         transaction = Transaction.query.get(transaction_id)
         if not transaction:
-            return json_response(False, f'No transaction found with ID: {transaction_id}', error='Transaction not found', status_code=404)
-
-        transaction = Transaction.query.get(transaction_id)
+            raise NotFoundError(f"No transaction found with ID: {transaction_id}")
         
         return json_response(True, 'Transaction retrieved successfully', data=transaction.to_dict(), status_code=200)
-        
+    
+    except NotFoundError as e:
+        return json_response(False, 'Not found', error=e.message, status_code=404)
     except Exception as e:
         return json_response(False, 'Failed to retrieve transaction', error=str(e), status_code=500)
 
-
+# Update an existing transaction
 @finance_bp.route('/transactions/<transaction_id>', methods=['PUT'])
 def update_transaction(transaction_id: str):
     """
@@ -168,17 +164,18 @@ def update_transaction(transaction_id: str):
         JSON: Updated transaction data
     """
     try:
-        transaction = Transaction.query.get(transaction_id)
-        if not transaction:
-            return json_response(False, f'No transaction found with ID: {transaction_id}', error='Transaction not found', status_code=404)
-        
-        data = request.get_json()
-        validate_transaction_data(data)  # Validate input data
-        if not data:
-            return json_response(False, 'Request must contain valid JSON data', error='No JSON data provided', status_code=400)
-        
         # Get existing transaction
         transaction = Transaction.query.get(transaction_id)
+        if not transaction:
+            raise NotFoundError(f"No transaction found with ID: {transaction_id}")
+        
+        # Get JSON data from request
+        data = request.get_json()
+        
+        if not data:
+            raise ValidationError('No JSON data provided', ['Request must contain valid JSON data'])
+        
+        validate_transaction_data(data)  # Validate input data
         
         # Update fields if provided
         if 'amount' in data:
@@ -192,16 +189,21 @@ def update_transaction(transaction_id: str):
         if 'date' in data:
             transaction.date = datetime.fromisoformat(data['date'])
         if 'tags' in data:
-            transaction.tags = data['tags']
+            # Ensure tags are stored as a comma-separated string
+            transaction.tags = ','.join(data['tags']) if isinstance(data['tags'], list) else data['tags']
         
+        db.session.commit()
+
         return json_response(True, 'Transaction updated successfully', transaction.to_dict(), status_code=200)
         
     except ValueError as e:
         return json_response(False, 'Input validation failed', error=e.message, details=e.errors, status_code=400)
+    except NotFoundError as e:
+        return json_response(False, 'Not found', error=e.message, status_code=404)
     except Exception as e:
         return json_response(False, 'Failed to update transaction', error=str(e), status_code=500)
 
-
+# Delete a transaction by ID
 @finance_bp.route('/transactions/<transaction_id>', methods=['DELETE'])
 def delete_transaction(transaction_id: str):
     """
@@ -216,18 +218,21 @@ def delete_transaction(transaction_id: str):
     try:
         transaction = Transaction.query.get(transaction_id)
         if not transaction:
-            return json_response(False, f'No transaction found with ID: {transaction_id}', error='Transaction not found', status_code=404)
+            raise NotFoundError(f"No transaction found with ID: {transaction_id}")
         
         # Delete transaction
         db.session.delete(transaction)
         db.session.commit()
+
         deleted_transaction = transaction
         return json_response(True, f'Transaction {transaction_id} deleted successfully', deleted_transaction.to_dict(), status_code=200)
         
+    except NotFoundError as e:
+        return json_response(False, 'Not found', error=e.message, status_code=404)
     except Exception as e:
         return json_response(False, 'Failed to delete transaction', error=str(e), status_code=500)
 
-
+# Get a summary of all transactions
 @finance_bp.route('/transactions/summary', methods=['GET'])
 def get_transactions_summary():
     """
@@ -293,6 +298,18 @@ def get_transactions_summary():
         return json_response(False, 'Failed to generate summary', error=str(e), status_code=500)
 
 # Global error handler for ValidationError
-@finance_bp.errorhandler(ValidationError)
+@finance_bp.errorhandler(ValidationError) # decorator to catch ValidationError exceptions
 def handle_validation_error(error):
     return json_response(False, "Input validation failed", error=error.message, details=error.errors, status_code=400)
+
+# Global error handler for NotFoundError
+@finance_bp.errorhandler(NotFoundError) # decorator to catch NotFoundError exceptions
+def handle_not_found_error(error):
+    return json_response(False, "Resource not found", error=error.message, status_code=404)
+
+# Global error handler for generic exceptions
+@finance_bp.errorhandler(Exception) # decorator to catch all other exceptions
+def handle_generic_error(error):
+    # Logging to be added in Issue #11
+    return json_response(False, "Internal server error", error=str(error), status_code=500)
+
