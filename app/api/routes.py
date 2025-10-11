@@ -8,7 +8,7 @@ budgets, and generating financial insights.
 from flask import request, jsonify
 from app.api import finance_bp
 from app.models.transaction import Transaction
-from app.utils.validators import validate_transaction_data
+from app.utils.validators import validate_transaction_data, ValidationError
 from datetime import datetime
 from typing import Dict, List
 from app import db
@@ -105,6 +105,7 @@ def create_transaction():
     try:
         # Get JSON data from request
         data = request.get_json()
+        validate_transaction_data(data)  # Validate input data
         
         if not data:
             return jsonify({
@@ -216,6 +217,7 @@ def update_transaction(transaction_id: str):
             }), 404
         
         data = request.get_json()
+        validate_transaction_data(data)  # Validate input data
         if not data:
             return jsonify({
                 'success': False,
@@ -373,3 +375,15 @@ def get_transactions_summary():
             'error': str(e),
             'message': 'Failed to generate summary'
         }), 500
+
+# Global error handler for ValidationError
+@finance_bp.errorhandler(ValidationError)
+def handle_validation_error(error):
+    response = jsonify({
+        "success": False,
+        "error": error.message,
+        "details": error.errors,
+        "message": "Input validation failed"
+    })
+    response.status_code = 400
+    return response
