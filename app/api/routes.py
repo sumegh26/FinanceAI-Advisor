@@ -100,38 +100,23 @@ def export_transactions():
         transaction_type = request.args.get('transaction_type')
         start_date = request.args.get('start_date')
         end_date = request.args.get('end_date')
-        export_format = request.args.get('format', 'csv').lower()
+        export_format = request.args.get('format', 'pdf').lower()
 
-        filtered_transactions = Transaction.query    #query all transactions from the database
+        filtered_transactions = Transaction.query
 
-        # Apply filters
         if category:
-            filtered_transactions = [
-                t for t in filtered_transactions 
-                if t.category.lower() == category.lower()
-            ]
-        
+            filtered_transactions = filtered_transactions.filter(Transaction.category.ilike(category))
         if transaction_type:
-            filtered_transactions = [
-                t for t in filtered_transactions 
-                if t.transaction_type.lower() == transaction_type.lower()
-            ]
-        
+            filtered_transactions = filtered_transactions.filter(Transaction.transaction_type.ilike(transaction_type))
         if start_date:
             start = datetime.fromisoformat(start_date)
-            filtered_transactions = [
-                t for t in filtered_transactions 
-                if t.date >= start
-            ]
-        
+            filtered_transactions = filtered_transactions.filter(Transaction.date >= start)
         if end_date:
             end = datetime.fromisoformat(end_date)
-            filtered_transactions = [
-                t for t in filtered_transactions 
-                if t.date <= end
-            ]
+            filtered_transactions = filtered_transactions.filter(Transaction.date <= end)
 
         Transactions = filtered_transactions.all()
+
 
         # Calculate totals
         total_income = sum(t.amount for t in Transactions if t.transaction_type == 'income')

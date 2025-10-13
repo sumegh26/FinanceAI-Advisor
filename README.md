@@ -64,10 +64,8 @@ FinanceAI-Advisor/
 - Flask-Migrate integration
 - Alembic for database migrations
 - Environment variable configuration with `.env`
-  
-### ⏭ Upcoming Features
 - SQLite database via SQLAlchemy ORM
-
+  
 ## 🚀 Features
 
 ### Current Features
@@ -83,6 +81,12 @@ FinanceAI-Advisor/
 - **Date Range Queries**: Filter by custom date ranges
 - **Transaction Type Filtering**: Separate income from expenses
 - **Multi-Parameter Combinations**: Complex query support
+
+#### ✅ **Data Export & Reporting**
+- **CSV and PDF Export**: Download filtered transactions as CSV, PDF files
+- **Financial Summaries**: Automatic totals (income, expenses, net balance)
+- **Advanced Filtering**: Export specific date ranges, categories, or transaction types
+- **Excel Compatibility**: CSV format compatible with Excel and Google Sheets
 
 #### ✅ **Financial Analytics**
 - **Real-Time Calculations**: Live balance and total calculations
@@ -158,10 +162,13 @@ curl -X POST http://127.0.0.1:5000/api/v1/transactions \
   }'
 
 # 3. Get all transactions
-curl http://127.0.0.1:5000/api/v1/transactions
+curl "http://127.0.0.1:5000/api/v1/transactions"
 
-# 4. Run tests
-pytest tests/ -v
+# 4. Export transactions as pdf
+curl "http://127.0.0.1:5000/api/v1/transactions/export?format=pdf" -o transactions.pdf
+
+# 5. Export transactions as csv
+curl "http://127.0.0.1:5000/api/v1/transactions/export?format=csv" -o transactions.csv
 ```
 
 ---
@@ -172,7 +179,7 @@ pytest tests/ -v
 
 - **Base URL**: `http://127.0.0.1:5000/api/v1`
 - **Content-Type**: `application/json`
-- **Response Format**: JSON with consistent structure with success flags and error details
+- **Response Format**: `JSON with consistent structure with success flags and error details`
 
 ### Response Format
 
@@ -196,6 +203,8 @@ pytest tests/ -v
 | PUT | `/api/v1/transactions/{id}` | Update transaction |
 | DELETE | `/api/v1/transactions/{id}` | Delete transaction |
 | GET | `/api/v1/transactions/summary` | Financial summary |
+| GET | `/api/v1/transactions/export` | Export transactions (pdf) |
+
 
 ### Detailed Endpoint Documentation
 
@@ -283,16 +292,38 @@ curl -X POST http://127.0.0.1:5000/api/v1/transactions \
 # Get transactions filtered by category
 curl "http://127.0.0.1:5000/api/v1/transactions?category=salary"
 
+# Get transactions filtered by transaction_type
+curl "http://127.0.0.1:5000/api/v1/transactions?transaction_type=expense"
+
+# Get transactions filtered by start_date
+curl "http://127.0.0.1:5000/api/v1/transactions?start_date=2025-10-13"
+
+# Get transactions filtered by end_date
+curl "http://127.0.0.1:5000/api/v1/transactions?end_date=2025-10-13"
+
 # Get financial summary
-curl http://127.0.0.1:5000/api/v1/transactions/summary
+curl "http://127.0.0.1:5000/api/v1/transactions/summary"
 
 # Update transaction
-curl -X PUT http://127.0.0.1:5000/api/v1/transactions/550e8400-e29b-41d4-a716-446655440000 \
-  -H "Content-Type: application/json" \
-  -d '{
-    "description": "Updated description",
-    "tags": ["updated", "modified"]
-  }'
+curl -X PUT http://127.0.0.1:5000/api/v1/transactions/1\
+-H "Content-Type: application/json" \
+-d '{
+"amount": 9998.0,
+  "category": "salary",
+  "description": "October salary",
+  "transaction_type": "income",
+  "tags": ["updated", "modified"]
+}'
+
+# Export all transactions as pdf
+curl "http://127.0.0.1:5000/api/v1/transactions/export" -o all_transactions.pdf
+
+# Export by date range
+curl "http://127.0.0.1:5000/api/v1/transactions/export?&start_date=2025-01-01&end_date=2025-01-31" -o january_transactions.pdf
+
+# Export specific category
+curl "http://127.0.0.1:5000/api/v1/transactions/export?&category=salary" -o salary_transactions.pdf
+
 ```
 ## 🤝 Contributing
 Contribution & Branching
