@@ -420,6 +420,7 @@ dmypy.json
 # ==========================================
 
 # Add any project-specific files here
+*.csv
 # Example:
 # custom_config/
 # proprietary_data/
