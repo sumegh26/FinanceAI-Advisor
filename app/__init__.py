@@ -62,7 +62,7 @@ def create_app():
         return {
             'status': 'healthy',
             'service': 'FinanceAI-Advisor',
-            'version': '2.0.0'
+            'version': '0.3.0'
         }, 200
 
     return app
