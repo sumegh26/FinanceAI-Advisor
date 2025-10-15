@@ -4,10 +4,12 @@ import pandas as pd
 import plotly.express as px
 import os
 from dotenv import load_dotenv
-import openai
+import google.generativeai as genai
 
-load_dotenv()
-openai.api_key = os.getenv("OPENAI_API_KEY")
+
+# Load environment variables
+load_dotenv()   # Load .env file
+genai.configure(api_key=os.getenv("GOOGLE_API_KEY")) # Configure Gemini API key
 
 # --- Configuration ---
 API_BASE = "http://127.0.0.1:5000/api/v1"
@@ -20,7 +22,7 @@ st.title("💰 FinanceAI-Advisor Dashboard")
 st.markdown("Smart personal finance management powered by your Flask backend.")
 
 # --- Sidebar Navigation ---
-page = st.sidebar.radio("📂 Navigation", ["Dashboard", "Add Transaction", "delete_transaction","Sort Transactions","Visualize Transactions","Statistics","Trends","AI Insights", "Export Data"])
+page = st.sidebar.radio("📂 Navigation", ["Dashboard", "Add Transaction", "delete_transaction","Sort Transactions","Visualize Transactions","AI Insights", "Export Data"])
 
 # --- Utility function ---
 def get_transactions():
@@ -193,66 +195,29 @@ elif page == "Visualize Transactions":
         st.plotly_chart(fig, use_container_width=True)
     else:
         st.info("No transactions available to visualize.")
-elif page == "Statistics":
-    st.header("📐 Transaction Statistics")
-    df = get_transactions()
-    if not df.empty:
-        st.subheader("Descriptive Statistics")
-        st.write(df.describe(include='all'))
-
-        st.subheader("Correlation Matrix")
-        corr = df.select_dtypes(include=['number']).corr()
-        fig = px.imshow(corr, text_auto=True, title="Correlation Matrix")
-        st.plotly_chart(fig, use_container_width=True)
-    else:
-        st.info("No transactions available to analyze.")
-elif page == "Trends":
-    st.header("📅 Transaction Trends")
-    df = get_transactions()
-    if not df.empty:
-        df['date'] = pd.to_datetime(df['date'])
-        df.set_index('date', inplace=True)
-        monthly_trends = df.resample('M').sum().reset_index()
-
-        fig = px.line(monthly_trends, x='date', y='amount', title="Monthly Transaction Trends")
-        st.plotly_chart(fig, use_container_width=True)
-    else:
-        st.info("No transactions available to analyze trends.")
 # --- AI Insights Page ---
 elif page == "AI Insights":
-    st.header("🧠 AI Financial Insights")
-
-    # Fetch current summary
+    st.header("🧠 AI Financial Insights (Google Gemini)")
     summary_res = requests.get(f"{API_BASE}/transactions/summary").json()
     summary = summary_res.get("data", {})
 
     st.subheader("Current Summary")
     st.json(summary)
 
-    st.markdown("### 💬 Ask an AI Question About Your Finances")
+    user_query = st.text_input("Ask a question about your finances:")
 
-    user_query = st.text_input("Ask a question (e.g., 'How can I reduce my expenses?')")
-
-    if st.button("Analyze with AI"):
-        if not user_query.strip():
-            st.warning("Please enter a question first.")
+    if st.button("Generate AI Insights"):
+        if user_query.strip():
+            with st.spinner("Thinking..."):
+                model = genai.GenerativeModel("gemini-2.5-flash")
+                # Crafting a detailed prompt for better context in a multi line format
+                
+                prompt = f"You are a witty and fun financial advisor dealing with rupees and have good knowledge of financial matters especially in the indian context. You are being used in a Financial Insights application called FinanceAI. Provide quick crisp, brief and actionable insights based on the data: {summary}, answer: {user_query}"
+                response = model.generate_content(prompt)
+                st.markdown("### 💬 Gemini Response")
+                st.write(response.text)
         else:
-            with st.spinner("Analyzing..."):
-                prompt = f"""
-                You are a financial advisor. 
-                Based on this user's transaction summary: {summary}, 
-                answer their question: {user_query}
-                Give practical, concise advice.
-                """
-
-                response = openai.ChatCompletion.create(
-                    model="gpt-4-turbo",
-                    messages=[{"role": "user", "content": prompt}]
-                )
-
-                ai_reply = response.choices[0].message["content"]
-                st.success("AI Response:")
-                st.write(ai_reply)
+            st.warning("Please enter a question first.")
 
 
 # --- Export Page ---
