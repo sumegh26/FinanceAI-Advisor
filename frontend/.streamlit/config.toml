@@ -1,0 +1,87 @@
+# FinanceAI-Advisor Custom Theme Configuration
+# Place this file in: .streamlit/config.toml
+
+# ==============================================
+# THEME CONFIGURATION - Professional Finance Theme
+# ==============================================
+
+#[theme]
+# Base theme: "light" or "dark"
+# This sets the foundation for your custom theme
+# base = "light"
+
+# PRIMARY COLOR - Used for interactive elements (buttons, checkboxes, radio buttons)
+# Finance-themed professional blue-green
+# primaryColor = "#00D9FF"
+
+# BACKGROUND COLOR - Main content area background
+# Dark, professional background for better contrast
+# backgroundColor = "#0E1117"
+
+# SECONDARY BACKGROUND COLOR - Sidebar, widgets, code blocks
+# Slightly lighter than main background for depth
+# secondaryBackgroundColor = "#1E2530"
+
+# TEXT COLOR - Main text color
+# Light gray for comfortable reading on dark background
+# textColor = "#FAFAFA"
+
+# FONT FAMILY - Options: "sans serif", "serif", "monospace"
+# Sans serif is clean and professional for dashboards
+# font = "sans serif"
+
+
+[theme]
+base = "light"
+primaryColor = "#e6855e"           # Soft coral (orange accent)
+backgroundColor = "#F9F9F6"        # Gentle off-white
+secondaryBackgroundColor = "#E8E5DF" # Card/sidebar, muted sand
+textColor = "#332E29"              # Deep gray-brown, high contrast
+font = "serif"
+
+
+
+
+# ==============================================
+# ADDITIONAL CONFIGURATION OPTIONS
+# ==============================================
+
+[server]
+# Port number for the server
+# Default is 8501, but you can change if needed
+port = 8501
+
+# Enable CORS (Cross-Origin Resource Sharing)
+enableCORS = false
+
+# Enable XSRF protection
+enableXsrfProtection = true
+
+# Maximum upload size in MB
+maxUploadSize = 200
+
+
+[browser]
+# Automatically open browser when starting the app
+gatherUsageStats = false
+
+# Server address
+serverAddress = "localhost"
+
+
+[runner]
+# Run the app in fast mode (recommended for development)
+fastReruns = true
+
+# Fix matplotlib warning
+magicEnabled = true
+
+
+# ==============================================
+# USAGE NOTES
+# ==============================================
+# 1. After creating this file, restart your Streamlit app
+# 2. The theme will be applied automatically
+# 3. Users can still toggle between light/dark mode in Settings
+# 4. To test different themes, uncomment the desired theme block
+# 5. Remember to reload the app after making changes
